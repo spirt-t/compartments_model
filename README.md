@@ -6,9 +6,9 @@ The model makes it possible to fit experimental data on the drug release and det
 
 To run the calculations you should to:  
 1. install python version > 3.0 (_for example, by official site https://www.python.org/downloads/_)
-2. in the project folder install libraries with command on the command line:
+2. in the project folder install libraries with command on the command line:  
    `pip3 install -r requirements.txt`   
-3. in the project folder run script with command
+3. in the project folder run script with command  
    `python3 ./internal/model.py`  
    
 
