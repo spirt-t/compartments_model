@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from openpyxl.utils.dataframe import dataframe_to_rows
 from scipy.integrate import odeint
 import pandas as pd
 import tkinter as tk
@@ -1053,6 +1054,79 @@ def regression():
         sd_v = np.sqrt(np.diag(cov)[1])
 
 
+def save_calcilated_data():
+    file_name = tk.filedialog.asksaveasfilename()
+
+    wb = openpyxl.Workbook()
+    i = 0
+    t_label = 'Time ({})'.format(Output_Parameters[2])
+    ws = wb.active
+
+    # Plot the amount of drug released over time.
+    if 'Q' in plot:
+        if i == 0:
+            ws.title = "Amount of Drug Released"
+        else:
+            ws = wb.create_sheet("Amount of Drug Released")
+
+        Q_label = 'Amount of Drug Released ({})'.format(Output_Parameters[0])
+        dataset = pd.DataFrame({t_label: t, Q_label: Q1}, columns=[t_label, Q_label])
+
+        for r in dataframe_to_rows(dataset, index=False, header=True):
+            ws.append(r)
+
+        i = i + 1
+
+    # # Plot the flux
+    if 'flux' in plot:
+        if i == 0:
+            ws.title = "Flux per Unit Area"
+        else:
+            ws = wb.create_sheet("Flux per Unit Area")
+
+        J_label = 'Flux per Unit Area ({}/{}/{}^2)'.format(Output_Parameters[0], Output_Parameters[2], Output_Parameters[1])
+        dataset = pd.DataFrame({t_label: t[0:len(J_out)], J_label: J_out}, columns=[t_label, J_label])
+
+        for r in dataframe_to_rows(dataset, index=False, header=True):
+            ws.append(r)
+
+        i = i + 1
+
+    # Plot the concentration values
+    if 'concentration' in plot:
+        if i == 0:
+            ws.title = "Flux per Unit Area"
+        else:
+            ws = wb.create_sheet("Concentration")
+
+        R_label = 'Radius ({})'.format(Output_Parameters[1])
+        C_label = 'Concentration ({}/{}^3)'.format(Output_Parameters[0], Output_Parameters[1])
+        dataset = pd.DataFrame({R_label: np.linspace(R0 / N / 2,
+                        R0 - (len(t_deg) - 2) * R0 / N - R0 / N / 2,
+                        N - len(t_deg) + 2), C_label: solver[-1, :]},
+                               columns=[R_label, C_label])
+
+        for r in dataframe_to_rows(dataset, index=False, header=True):
+            ws.append(r)
+
+        i = i + 1
+
+    # Plot the total flux
+    if 'total_flux' in plot:
+        if i == 0:
+            ws.title = "Flux per Unit Area"
+        else:
+            ws = wb.create_sheet("Total Flux Out")
+
+        F_label = 'Total Flux Out ({}/{})'.format(Output_Parameters[0], Output_Parameters[2])
+        dataset = pd.DataFrame({t_label: t[0:len(J_total)], F_label: J_total}, columns=[t_label, F_label])
+
+        for r in dataframe_to_rows(dataset, index=False, header=True):
+            ws.append(r)
+
+    wb.save(file_name + ".xlsx")
+
+
 def show_results():
     rows = 2
     columns = 2
@@ -1087,7 +1161,8 @@ def show_results():
     R_CV_label.grid(row=3, column=0, padx=30, pady=3, sticky=tk.N)
 
     mass_label = tk.Label(output_results_root, text='with {} of drug loaded and {} percent of drug boud'.format(mass,
-                        mass_bound / mass * 100), font=arial)
+                                                                                                                mass_bound / mass * 100),
+                          font=arial)
     mass_label.grid(row=4, column=0, padx=30, pady=10, sticky=tk.N)
 
     # -=-=-=-=-=- the following prints some relevant information to screen after calculations are complete
@@ -1096,13 +1171,18 @@ def show_results():
         info_best_fit_label = tk.Label(output_results_root, text="The parameters with best fit are below:", font=arial)
         info_best_fit_label.grid(row=5, column=0, padx=30, pady=3, sticky=tk.N)
 
-        fit_D_label = tk.Label(output_results_root, text="D = {:.4e} with standard deviation = {:.4e}".
-                               format(stat_D, sd_D), font=arial)
+        fit_D_label = tk.Label(output_results_root, text="D = {:.4e} {}^2/{} with standard deviation = {:.4e}".
+                               format(stat_D, Output_Parameters[1], Output_Parameters[2], sd_D), font=arial)
         fit_D_label.grid(row=6, column=0, padx=30, pady=3, sticky=tk.N)
 
-        fit_v_label = tk.Label(output_results_root, text="v = {:.4e} with standard deviation = {:.4e}".
-                               format(stat_v, sd_v), font=arial)
+        fit_v_label = tk.Label(output_results_root, text="v = {:.4e} {}/{} with standard deviation = {:.4e}".
+                               format(stat_v, Output_Parameters[1], Output_Parameters[2], sd_v), font=arial)
         fit_v_label.grid(row=7, column=0, padx=30, pady=3, sticky=tk.N)
+
+    style.configure('Save.TButton', font=arial, borderless=1)
+    save_calcilated_data_button = ttk.Button(output_results_root, text="Save fitted points",
+                                             command=lambda: [save_calcilated_data()], style='Save.TButton')
+    save_calcilated_data_button.grid(row=9, padx=30, column=0, pady=3)
 
     "###-=-=-=-=-=-=-=-=-=-=-=-=- Graph Results -=-=-=-=-=-=-=-=-=-=-=-=-=-###"
     if make_graphs.get() is True:
@@ -1199,13 +1279,13 @@ note.pack(fill=tk.BOTH, expand=True)
 tab01 = tk.ttk.Frame(note)
 tab01.pack(fill=tk.BOTH, expand=True)
 
-canvas=tk.Canvas(tab01)
-vbar=tk.Scrollbar(tab01, orient=tk.VERTICAL, command=canvas.yview)
+canvas = tk.Canvas(tab01)
+vbar = tk.Scrollbar(tab01, orient=tk.VERTICAL, command=canvas.yview)
 vbar.pack(side=tk.RIGHT, fill=tk.Y)
 canvas.configure(yscrollcommand=vbar.set, scrollregion=canvas.bbox("all"))
 canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 tab1 = tk.Frame(canvas)
-canvas.create_window((0,0), window=tab1, anchor=tk.NW)
+canvas.create_window((0, 0), window=tab1, anchor=tk.NW)
 
 tab2 = tk.ttk.Frame(note)
 tab2.pack(fill=tk.BOTH, expand=True)
@@ -1713,7 +1793,8 @@ about1_label = tk.Label(tab3,
 ################################
 
 style.configure('Calculate.TButton', background='#3CB371', font=arial, width=20)
-b5 = ttk.Button(tab1, text='Calculate', command=lambda: [check(), define_params(), regression(), show_results()], style='Calculate.TButton')
+b5 = ttk.Button(tab1, text='Calculate', command=lambda: [check(), define_params(), regression(), show_results()],
+                style='Calculate.TButton')
 b5.grid(row=21, column=2, sticky=tk.E)
 
 emply_label = tk.Label(tab1, text='')
