@@ -30,6 +30,9 @@ def check():
             plot.append('total_flux')
         if plot_concentration.get() == 1:
             plot.append('concentration')
+        if len(plot) > 0:
+            make_graphs.set(1)
+
         global define_parameters
         define_parameters = True
         global choose_geometry
@@ -1238,10 +1241,6 @@ use_distribution_checkbox.pack(anchor=tk.W, padx=10)
 
 make_graphs = tk.BooleanVar()
 make_graphs.set(0)
-make_graphs_checkbox = tk.Checkbutton(choose_root, text="Make graphs",
-                                      variable=make_graphs,
-                                      onvalue=1, offvalue=0)
-make_graphs_checkbox.pack(anchor=tk.W, padx=10)
 
 "###-=-=-=-=-=-=- Choose the geometry -=-=-=-=-=-=-###"
 
