@@ -943,7 +943,7 @@ def clarify_Q(Q1, xm, t):
 
 def define_input_parameters():
     Input_Parameters = []
-    # Choose from pg, ng, ug, mg, g, kg
+    # Choose from pg, ng, ug, mg, g, kg, %
     if input_mass_var.get() == 1:
         Input_Parameters.append('pg')
     if input_mass_var.get() == 2:
@@ -956,6 +956,8 @@ def define_input_parameters():
         Input_Parameters.append('g')
     if input_mass_var.get() == 6:
         Input_Parameters.append('kg')
+    if input_mass_var.get() == 7:
+        Input_Parameters.append('percent')
     #             pm, nm, um, mm, cm, m
     if input_length_var.get() == 1:
         Input_Parameters.append('pm')
@@ -985,7 +987,7 @@ def define_input_parameters():
 
 def define_output_parameters():
     Output_Parameters = []
-    # Choose from pg, ng, ug, mg, g, kg
+    # Choose from pg, ng, ug, mg, g, kg, %
     if output_mass_var.get() == 1:
         Output_Parameters.append('pg')
     if output_mass_var.get() == 2:
@@ -998,6 +1000,8 @@ def define_output_parameters():
         Output_Parameters.append('g')
     if output_mass_var.get() == 6:
         Output_Parameters.append('kg')
+    if output_mass_var.get() == 7:
+        Output_Parameters.append('percent')
     #             pm, nm, um, mm, cm, m
     if output_length_var.get() == 1:
         Output_Parameters.append('pm')
@@ -1328,6 +1332,10 @@ intput_kg = tk.Radiobutton(input_parameters_root, text='kg', variable=input_mass
                            command=lambda: [choose_input_mass(6)])
 intput_kg.grid(row=6, column=0, padx=10, sticky=tk.W)
 
+intput_percent = tk.Radiobutton(input_parameters_root, text='%', variable=input_mass_var, value=7,
+                           command=lambda: [choose_input_mass(7)])
+intput_percent.grid(row=7, column=0, padx=10, sticky=tk.W)
+
 
 def choose_input_mass(val):
     input_mass_var.set(val)
@@ -1421,6 +1429,9 @@ intput_g.grid(row=5, column=0, padx=10, sticky=tk.W)
 intput_kg = tk.Radiobutton(output_parameters_root, text='kg', variable=output_mass_var, value=6,
                            command=lambda: [choose_output_mass(6)])
 intput_kg.grid(row=6, column=0, padx=10, sticky=tk.W)
+intput_percent = tk.Radiobutton(output_parameters_root, text='%', variable=output_mass_var, value=7,
+                           command=lambda: [choose_output_mass(7)])
+intput_percent.grid(row=7, column=0, padx=10, sticky=tk.W)
 
 
 def choose_output_mass(val):
@@ -1506,93 +1517,93 @@ emply_label = tk.Label(tab1, text='')
 emply_label.grid(row=6, column=0, sticky=tk.S)
 
 N_label = tk.Label(tab1, text='Number of compartments:')
-N_label.grid(row=7, column=0, padx=15, pady=3, sticky=tk.E)
+N_label.grid(row=8, column=0, padx=15, pady=3, sticky=tk.E)
 entry_N = tk.Entry(tab1, width=15)
-entry_N.grid(row=7, column=1, padx=15, pady=3, sticky=tk.W)
+entry_N.grid(row=8, column=1, padx=15, pady=3, sticky=tk.W)
 entry_N.insert(0, '10 (default)')
 
 ti_label = tk.Label(tab1, text='Number of time intervals:')
-ti_label.grid(row=8, column=0, padx=15, pady=3, sticky=tk.E)
+ti_label.grid(row=9, column=0, padx=15, pady=3, sticky=tk.E)
 entry_ti = tk.Entry(tab1, width=15)
-entry_ti.grid(row=8, column=1, padx=15, pady=3, sticky=tk.W)
+entry_ti.grid(row=9, column=1, padx=15, pady=3, sticky=tk.W)
 entry_ti.insert(0, '10000 (default)')
 
 count_label = tk.Label(tab1, text='Number of particles / fibres:')
-count_label.grid(row=9, column=0, padx=15, pady=3, sticky=tk.E)
+count_label.grid(row=10, column=0, padx=15, pady=3, sticky=tk.E)
 entry_count = tk.Entry(tab1, width=15)
-entry_count.grid(row=9, column=1, padx=15, pady=3, sticky=tk.W)
+entry_count.grid(row=10, column=1, padx=15, pady=3, sticky=tk.W)
 entry_count.insert(0, '1000 (default)')
 
 mass_label = tk.Label(tab1, text='Mass loaded in each particle / fibre [M]:')
-mass_label.grid(row=10, column=0, padx=15, pady=3, sticky=tk.E)
+mass_label.grid(row=11, column=0, padx=15, pady=3, sticky=tk.E)
 entry_mass = tk.Entry(tab1, width=15)
-entry_mass.grid(row=10, column=1, padx=15, pady=3, sticky=tk.W)
+entry_mass.grid(row=11, column=1, padx=15, pady=3, sticky=tk.W)
 entry_mass.insert(0, '120 (default)')
 
 mass_bound_label = tk.Label(tab1, text='Mass bound to each particle / fibre [M]:')
-mass_bound_label.grid(row=11, column=0, padx=15, pady=3, sticky=tk.E)
+mass_bound_label.grid(row=12, column=0, padx=15, pady=3, sticky=tk.E)
 entry_mass_bound = tk.Entry(tab1, width=15)
-entry_mass_bound.grid(row=11, column=1, padx=15, pady=3, sticky=tk.W)
+entry_mass_bound.grid(row=12, column=1, padx=15, pady=3, sticky=tk.W)
 entry_mass_bound.insert(0, '0 (default)')
 
 v_label = tk.Label(tab1, text='Erosion front velocity [L/T]:')
-v_label.grid(row=12, column=0, padx=15, pady=3, sticky=tk.E)
+v_label.grid(row=13, column=0, padx=15, pady=3, sticky=tk.E)
 entry_v = tk.Entry(tab1, width=15)
-entry_v.grid(row=12, column=1, padx=15, pady=3, sticky=tk.W)
+entry_v.grid(row=13, column=1, padx=15, pady=3, sticky=tk.W)
 entry_v.insert(0, '1.9e-8 (default)')
 
 D_label = tk.Label(tab1, text='Diffusion coefficient [L^2/T]:')
-D_label.grid(row=13, column=0, padx=15, pady=3, sticky=tk.E)
+D_label.grid(row=14, column=0, padx=15, pady=3, sticky=tk.E)
 entry_D = tk.Entry(tab1, width=15)
-entry_D.grid(row=13, column=1, padx=15, pady=3, sticky=tk.W)
+entry_D.grid(row=14, column=1, padx=15, pady=3, sticky=tk.W)
 entry_D.insert(0, '5e-9 (default)')
 
 R0_label = tk.Label(tab1, text='Initial radius/width [L]:')
-R0_label.grid(row=14, column=0, padx=15, pady=3, sticky=tk.E)
+R0_label.grid(row=15, column=0, padx=15, pady=3, sticky=tk.E)
 entry_R0 = tk.Entry(tab1, width=15)
-entry_R0.grid(row=14, column=1, padx=15, pady=3, sticky=tk.W)
+entry_R0.grid(row=15, column=1, padx=15, pady=3, sticky=tk.W)
 entry_R0.insert(0, '0.1 (default)')
 
 h_label = tk.Label(tab1, text='Height of cylinder [L]:')
-h_label.grid(row=15, column=0, padx=15, pady=3, sticky=tk.E)
+h_label.grid(row=16, column=0, padx=15, pady=3, sticky=tk.E)
 entry_h = tk.Entry(tab1, width=15)
-entry_h.grid(row=15, column=1, padx=15, pady=3, sticky=tk.W)
+entry_h.grid(row=16, column=1, padx=15, pady=3, sticky=tk.W)
 entry_h.insert(0, '1000 (default)')
 
 slab_area_label = tk.Label(tab1, text='Area of slab [L^2]:')
-slab_area_label.grid(row=16, column=0, padx=15, pady=3, sticky=tk.E)
+slab_area_label.grid(row=17, column=0, padx=15, pady=3, sticky=tk.E)
 entry_slab_area = tk.Entry(tab1, width=15)
-entry_slab_area.grid(row=16, column=1, padx=15, pady=3, sticky=tk.W)
+entry_slab_area.grid(row=17, column=1, padx=15, pady=3, sticky=tk.W)
 entry_slab_area.insert(0, '1000 (default)')
 
 t0_label = tk.Label(tab1, text='Start time [T]:')
-t0_label.grid(row=17, column=0, padx=15, pady=3, sticky=tk.E)
+t0_label.grid(row=18, column=0, padx=15, pady=3, sticky=tk.E)
 entry_t0 = tk.Entry(tab1, width=15)
-entry_t0.grid(row=17, column=1, padx=15, pady=3, sticky=tk.W)
+entry_t0.grid(row=18, column=1, padx=15, pady=3, sticky=tk.W)
 entry_t0.insert(0, '0 (default)')
 
 tm_label = tk.Label(tab1, text='End time [T]:')
-tm_label.grid(row=18, column=0, padx=15, pady=3, sticky=tk.E)
+tm_label.grid(row=19, column=0, padx=15, pady=3, sticky=tk.E)
 entry_tm = tk.Entry(tab1, width=15)
-entry_tm.grid(row=18, column=1, padx=15, pady=3, sticky=tk.W)
+entry_tm.grid(row=19, column=1, padx=15, pady=3, sticky=tk.W)
 entry_tm.insert(0, '100 (default)')
 
 tolerance_label = tk.Label(tab1, text='Tolerance:')
-tolerance_label.grid(row=19, column=0, padx=15, pady=3, sticky=tk.E)
+tolerance_label.grid(row=20, column=0, padx=15, pady=3, sticky=tk.E)
 entry_tolerance = tk.Entry(tab1, width=15)
-entry_tolerance.grid(row=19, column=1, padx=15, pady=3, sticky=tk.W)
+entry_tolerance.grid(row=20, column=1, padx=15, pady=3, sticky=tk.W)
 entry_tolerance.insert(0, '0.01 (default)')
 
 SD_label = tk.Label(tab1, text='Standard deviation [L]:')
-SD_label.grid(row=20, column=0, padx=15, pady=3, sticky=tk.E)
+SD_label.grid(row=21, column=0, padx=15, pady=3, sticky=tk.E)
 entry_SD = tk.Entry(tab1, width=15)
-entry_SD.grid(row=20, column=1, padx=15, pady=3, sticky=tk.W)
+entry_SD.grid(row=21, column=1, padx=15, pady=3, sticky=tk.W)
 entry_SD.insert(0, '0 (default)')
 
 bins_label = tk.Label(tab1, text='Number of bins in distribution:')
-bins_label.grid(row=21, column=0, padx=15, pady=3, sticky=tk.E)
+bins_label.grid(row=22, column=0, padx=15, pady=3, sticky=tk.E)
 entry_bins = tk.Entry(tab1, width=15)
-entry_bins.grid(row=21, column=1, padx=15, pady=3, sticky=tk.W)
+entry_bins.grid(row=22, column=1, padx=15, pady=3, sticky=tk.W)
 entry_bins.insert(0, '10 (default)')
 
 "###-=-=-=-=-=-=-=- Experimental data -=-=-=-=-=-=-=-###"
@@ -1615,41 +1626,41 @@ def read_experimental_data():
 style.configure('Open.TButton', font=arial, borderless=1)
 data_file_button = ttk.Button(tab1, text="Open experimental data file (.xlsx)",
                               command=lambda: [read_experimental_data()], style='Open.TButton')
-data_file_button.grid(row=7, column=2, pady=3, columnspan=2)
+data_file_button.grid(row=8, column=2, pady=3, columnspan=2)
 
 columns_label = tk.Label(tab1, text='Please enter column numbers for your\nexperimental data (actual only, starting at '
                                     '1)', font=arial)
-columns_label.grid(row=9, rowspan=2, column=2, padx=10, pady=3, sticky=tk.N, columnspan=2)
+columns_label.grid(row=10, rowspan=2, column=2, padx=10, pady=3, sticky=tk.N, columnspan=2)
 
 time_column_label = tk.Label(tab1, text='Time column number:')
-time_column_label.grid(row=11, column=2, padx=10, pady=3, sticky=tk.W)
+time_column_label.grid(row=12, column=2, padx=10, pady=3, sticky=tk.W)
 entry_time_column = tk.Entry(tab1, width=10)
-entry_time_column.grid(row=11, column=3, padx=10, pady=3, sticky=tk.W)
+entry_time_column.grid(row=12, column=3, padx=10, pady=3, sticky=tk.W)
 
 release_column_label = tk.Label(tab1, text='Release column number:')
-release_column_label.grid(row=12, column=2, padx=10, pady=3, sticky=tk.W)
+release_column_label.grid(row=13, column=2, padx=10, pady=3, sticky=tk.W)
 entry_release_column = tk.Entry(tab1, width=10)
-entry_release_column.grid(row=12, column=3, padx=10, pady=3, sticky=tk.W)
+entry_release_column.grid(row=13, column=3, padx=10, pady=3, sticky=tk.W)
 
 flux_column_label = tk.Label(tab1, text='Flux column number:')
-flux_column_label.grid(row=13, column=2, padx=10, pady=3, sticky=tk.W)
+flux_column_label.grid(row=14, column=2, padx=10, pady=3, sticky=tk.W)
 entry_flux_column = tk.Entry(tab1, width=10)
-entry_flux_column.grid(row=13, column=3, padx=10, pady=3, sticky=tk.W)
+entry_flux_column.grid(row=14, column=3, padx=10, pady=3, sticky=tk.W)
 
 total_flux_column_label = tk.Label(tab1, text='Total flux column number:')
-total_flux_column_label.grid(row=14, column=2, padx=10, pady=3, sticky=tk.W)
+total_flux_column_label.grid(row=15, column=2, padx=10, pady=3, sticky=tk.W)
 entry_total_flux_column = tk.Entry(tab1, width=10)
-entry_total_flux_column.grid(row=14, column=3, padx=10, pady=3, sticky=tk.W)
+entry_total_flux_column.grid(row=15, column=3, padx=10, pady=3, sticky=tk.W)
 
 x_column_label = tk.Label(tab1, text='Flux column number:')
-x_column_label.grid(row=15, column=2, padx=10, pady=3, sticky=tk.W)
+x_column_label.grid(row=16, column=2, padx=10, pady=3, sticky=tk.W)
 entry_x_column = tk.Entry(tab1, width=10)
-entry_x_column.grid(row=15, column=3, padx=10, pady=3, sticky=tk.W)
+entry_x_column.grid(row=16, column=3, padx=10, pady=3, sticky=tk.W)
 
 concentration_column_label = tk.Label(tab1, text='Flux column number:')
-concentration_column_label.grid(row=16, column=2, padx=10, pady=3, sticky=tk.W)
+concentration_column_label.grid(row=17, column=2, padx=10, pady=3, sticky=tk.W)
 entry_concentration_column = tk.Entry(tab1, width=10)
-entry_concentration_column.grid(row=16, column=3, padx=10, pady=3, sticky=tk.W)
+entry_concentration_column.grid(row=17, column=3, padx=10, pady=3, sticky=tk.W)
 
 "###-=-=-=-=-=-=-=- Output results -=-=-=-=-=-=-=-###"
 
