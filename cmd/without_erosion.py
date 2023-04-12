@@ -47,7 +47,6 @@ import tkinter.font as tkFont
 
 # Laplace function: Qdi(s) (amount desorbed for a single radius fibre) to be defined below
 
-
 def save_file(rm, rad, sn, cv, td, Dd, st):
     f = fd.asksaveasfile(mode='w', defaultextension=".txt")
     if f is None: # asksaveasfile return `None` if dialog closed with "cancel".
@@ -58,7 +57,18 @@ def save_file(rm, rad, sn, cv, td, Dd, st):
     f.write("Characteristic time of diffusion (td) = %.2f %s\n" % (td, st))
     f.write("Diffusion coefficient = %.8f %s^2/%s\n" % (Dd, rad, st))
     f.close()
-    
+
+
+def saveSimulationPoints(xlist, ylist):
+    fl = fd.asksaveasfile(mode='w', defaultextension=".txt")
+    if fl is None:  # asksaveasfile return `None` if dialog closed with "cancel".
+        return
+
+    for x, y in zip(xlist, ylist):
+        fl.write("%s\t%s\n" % (x, y))
+
+    fl.close()
+
 def next_step():
     #print("linspace start")
     tt=linspace(t0,tmax,100)
@@ -78,7 +88,7 @@ def next_step():
     
     Dd = (((rm**2))/(plsq[0][0]))
     plt.rc('font',family='Times New Roman')
-    plt.plot(x,y,'ko', label='%s' %leg_exp) # here you can change the parameter 'k' 
+    plt.plot(x,y,'ko', label='%s' % (leg_exp)) # here you can change the parameter 'k'
                     # which which identifies the color of the experimental points. 
                     # For example, 'r' is red, 'g' is green, 'b' is blue,
                     # 'c' is azure, 'k' is black.
@@ -86,13 +96,15 @@ def next_step():
                     # 'o' near the 'k' indicates the shape of the experimental point.
                     # You can change it, for example:
                     # '>', '<', 'v' and '^' are the various triangles, 'D' is the rhombus,
-                    # 's' is the squares, '*' is the stars, 'x' is the X   
-    plt.plot(tt,peval(tt,plsq[0],p),'k-', label='%s' % (leg_mod)) # Here you can also 
+                    # 's' is the squares, '*' is the stars, 'x' is the X
+    yy = peval(tt,plsq[0],p)
+
+    plt.plot(tt,yy,'k-', label='%s' % (leg_mod)) # Here you can also
                     # change the black color 'k' like in the previous case,
                     # and also you can use different tipes of lines (here symbol next to 'k'):
                     # '-' is the solid line, '--' is the dashed line, ':' is the dotted line,
                     # '-.' is the dashed-dotted line
-    
+
     plt.xlabel('Time, %s' %st)
     plt.ylabel('Drug release')
     plt.show()
@@ -106,6 +118,7 @@ def next_step():
         name = "cylinder"
     elif var.get() == 3:
         name = "sphere"
+    name = "cylinder"
     root1.title("Results for %s" %name)
     xw = (root1.winfo_screenwidth()) / 6
     yw = (root1.winfo_screenheight()) / 4
@@ -127,6 +140,8 @@ def next_step():
     but = ttk.Button(root1, text='Save', style = 'exit.TButton', 
                     command=lambda:[save_file(rm, rad, sn, cv, plsq[0][0], Dd, st)])
     but.grid(row=5, column=0, pady=6)
+
+    saveSimulationPoints(tt, yy)
     #print("new TK window end")
     root1.mainloop()
     
@@ -216,20 +231,26 @@ def check(entry_td, entry_m0, entry_q0, entry_st,
         global D_0
         D_0 = entry_td.get()
         D_0 = float(D_0)
+
         td_0 = rm**2/D_0
         global m0_0
         m0_0 = entry_m0.get()
+
         global q0_0
         q0_0 = entry_q0.get()
+
         td_0 = float(td_0)
         m0_0 = float(m0_0)
         q0_0 = float(q0_0)
         global st
         st = entry_st.get()
+
         global leg_exp
         leg_exp = entry_exp.get()
+
         global leg_mod
         leg_mod = entry_mod.get()
+
         global rad
         rad = entry_rad.get()
     except ValueError:
@@ -245,6 +266,8 @@ def insertText1():
     p=[]
     with open(file_name, 'r') as f:
         for line in f:
+            print(line)
+            print(line.split('\t')[0])
             ri.append(float(line.split('\t')[0]))
             p.append(float(line.split('\t')[1]))
     p=array(p) # probabilities from data
