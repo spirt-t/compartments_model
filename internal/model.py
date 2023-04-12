@@ -925,6 +925,17 @@ def calculate(time, D, v):
         return Q_out
 
 
+def saveSimulationPoints(xlist, ylist):
+    fl = filedialog.asksaveasfile(mode='w', defaultextension=".txt")
+    if fl is None:  # asksaveasfile return `None` if dialog closed with "cancel".
+        return
+
+    for x, y in zip(xlist, ylist):
+        fl.write("%s\t%s\n" % (x, y))
+
+    fl.close()
+
+
 def clarify_Q(Q1, xm, t):
     # -=-=-=-=-=- Q_output is new to regression code. It holds the calculated release values at the experimental t values
     # -=-=-=-=-=- This is because the curve_fit program requires the input function to have a specific output of this type
@@ -1086,7 +1097,6 @@ def show_results():
                                                                                             v, Output_Parameters[1],
                                                                                             Output_Parameters[2], N),
                            font=arial)
-
     D_v_N_label.grid(row=2, column=0, padx=30, pady=3, sticky=tk.N)
 
     R_CV_label = tk.Label(output_results_root,
@@ -1147,6 +1157,8 @@ def show_results():
             plt.xlabel(f'Time (${Output_Parameters[2]}$)', fontsize=x_text_size)
             plt.ylabel(f'Amount of Drug Released (${Output_Parameters[0]}$)',
                        fontsize=y_text_size)
+
+        saveSimulationPoints(t, Q1)
 
         # Plot the flux
         if 'flux' in plot:
@@ -1332,9 +1344,9 @@ intput_kg = tk.Radiobutton(input_parameters_root, text='kg', variable=input_mass
                            command=lambda: [choose_input_mass(6)])
 intput_kg.grid(row=6, column=0, padx=10, sticky=tk.W)
 
-intput_percent = tk.Radiobutton(input_parameters_root, text='%', variable=input_mass_var, value=7,
-                           command=lambda: [choose_input_mass(7)])
-intput_percent.grid(row=7, column=0, padx=10, sticky=tk.W)
+# intput_percent = tk.Radiobutton(input_parameters_root, text='%', variable=input_mass_var, value=7,
+#                            command=lambda: [choose_input_mass(7)])
+# intput_percent.grid(row=7, column=0, padx=10, sticky=tk.W)
 
 
 def choose_input_mass(val):
