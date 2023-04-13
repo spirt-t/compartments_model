@@ -8,8 +8,13 @@ To run the calculations you should to:
 1. install python version > 3.0 (_for example, by official site https://www.python.org/downloads/_)
 2. in the project folder install libraries with command on the command line:
    `pip3 install -r requirements.txt`   
-3. in the project folder run script with command
-   `python3 ./internal/model.py`  
+3. in the project folder run script 
+   - if you want to take into account only diffusion, use command:
+   `python3 ./cmd/without_erosion.py`  
+   - if you want to take into account diffusion and surface erosion, use command:   
+   `python3 ./cmd/with_erosion.py`  
+   - if you want to get the coefficients on the Peppas model from the previous simulation results, use command:   
+   `python3 ./cmd/fit.py`  
    
 
 Some help and instructions on how to use the model can be found on the `Manual` tab.  

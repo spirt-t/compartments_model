@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from openpyxl.utils.dataframe import dataframe_to_rows
 from scipy.integrate import odeint
 import pandas as pd
 import tkinter as tk
@@ -954,7 +955,7 @@ def clarify_Q(Q1, xm, t):
 
 def define_input_parameters():
     Input_Parameters = []
-    # Choose from pg, ng, ug, mg, g, kg, %
+    # Choose from pg, ng, ug, mg, g, kg
     if input_mass_var.get() == 1:
         Input_Parameters.append('pg')
     if input_mass_var.get() == 2:
@@ -967,8 +968,6 @@ def define_input_parameters():
         Input_Parameters.append('g')
     if input_mass_var.get() == 6:
         Input_Parameters.append('kg')
-    if input_mass_var.get() == 7:
-        Input_Parameters.append('percent')
     #             pm, nm, um, mm, cm, m
     if input_length_var.get() == 1:
         Input_Parameters.append('pm')
@@ -998,7 +997,7 @@ def define_input_parameters():
 
 def define_output_parameters():
     Output_Parameters = []
-    # Choose from pg, ng, ug, mg, g, kg, %
+    # Choose from pg, ng, ug, mg, g, kg
     if output_mass_var.get() == 1:
         Output_Parameters.append('pg')
     if output_mass_var.get() == 2:
@@ -1011,8 +1010,6 @@ def define_output_parameters():
         Output_Parameters.append('g')
     if output_mass_var.get() == 6:
         Output_Parameters.append('kg')
-    if output_mass_var.get() == 7:
-        Output_Parameters.append('percent')
     #             pm, nm, um, mm, cm, m
     if output_length_var.get() == 1:
         Output_Parameters.append('pm')
@@ -1071,6 +1068,79 @@ def regression():
         sd_v = np.sqrt(np.diag(cov)[1])
 
 
+def save_calcilated_data():
+    file_name = tk.filedialog.asksaveasfilename()
+
+    wb = openpyxl.Workbook()
+    i = 0
+    t_label = 'Time ({})'.format(Output_Parameters[2])
+    ws = wb.active
+
+    # Plot the amount of drug released over time.
+    if 'Q' in plot:
+        if i == 0:
+            ws.title = "Amount of Drug Released"
+        else:
+            ws = wb.create_sheet("Amount of Drug Released")
+
+        Q_label = 'Amount of Drug Released ({})'.format(Output_Parameters[0])
+        dataset = pd.DataFrame({t_label: t, Q_label: Q1}, columns=[t_label, Q_label])
+
+        for r in dataframe_to_rows(dataset, index=False, header=True):
+            ws.append(r)
+
+        i = i + 1
+
+    # # Plot the flux
+    if 'flux' in plot:
+        if i == 0:
+            ws.title = "Flux per Unit Area"
+        else:
+            ws = wb.create_sheet("Flux per Unit Area")
+
+        J_label = 'Flux per Unit Area ({}/{}/{}^2)'.format(Output_Parameters[0], Output_Parameters[2], Output_Parameters[1])
+        dataset = pd.DataFrame({t_label: t[0:len(J_out)], J_label: J_out}, columns=[t_label, J_label])
+
+        for r in dataframe_to_rows(dataset, index=False, header=True):
+            ws.append(r)
+
+        i = i + 1
+
+    # Plot the concentration values
+    if 'concentration' in plot:
+        if i == 0:
+            ws.title = "Flux per Unit Area"
+        else:
+            ws = wb.create_sheet("Concentration")
+
+        R_label = 'Radius ({})'.format(Output_Parameters[1])
+        C_label = 'Concentration ({}/{}^3)'.format(Output_Parameters[0], Output_Parameters[1])
+        dataset = pd.DataFrame({R_label: np.linspace(R0 / N / 2,
+                        R0 - (len(t_deg) - 2) * R0 / N - R0 / N / 2,
+                        N - len(t_deg) + 2), C_label: solver[-1, :]},
+                               columns=[R_label, C_label])
+
+        for r in dataframe_to_rows(dataset, index=False, header=True):
+            ws.append(r)
+
+        i = i + 1
+
+    # Plot the total flux
+    if 'total_flux' in plot:
+        if i == 0:
+            ws.title = "Flux per Unit Area"
+        else:
+            ws = wb.create_sheet("Total Flux Out")
+
+        F_label = 'Total Flux Out ({}/{})'.format(Output_Parameters[0], Output_Parameters[2])
+        dataset = pd.DataFrame({t_label: t[0:len(J_total)], F_label: J_total}, columns=[t_label, F_label])
+
+        for r in dataframe_to_rows(dataset, index=False, header=True):
+            ws.append(r)
+
+    wb.save(file_name + ".xlsx")
+
+
 def show_results():
     rows = 2
     columns = 2
@@ -1104,7 +1174,8 @@ def show_results():
     R_CV_label.grid(row=3, column=0, padx=30, pady=3, sticky=tk.N)
 
     mass_label = tk.Label(output_results_root, text='with {} of drug loaded and {} percent of drug boud'.format(mass,
-                        mass_bound / mass * 100), font=arial)
+                                                                                                                mass_bound / mass * 100),
+                          font=arial)
     mass_label.grid(row=4, column=0, padx=30, pady=10, sticky=tk.N)
 
     # -=-=-=-=-=- the following prints some relevant information to screen after calculations are complete
@@ -1113,13 +1184,18 @@ def show_results():
         info_best_fit_label = tk.Label(output_results_root, text="The parameters with best fit are below:", font=arial)
         info_best_fit_label.grid(row=5, column=0, padx=30, pady=3, sticky=tk.N)
 
-        fit_D_label = tk.Label(output_results_root, text="D = {:.4e} with standard deviation = {:.4e}".
-                               format(stat_D, sd_D), font=arial)
+        fit_D_label = tk.Label(output_results_root, text="D = {:.4e} {}^2/{} with standard deviation = {:.4e}".
+                               format(stat_D, Output_Parameters[1], Output_Parameters[2], sd_D), font=arial)
         fit_D_label.grid(row=6, column=0, padx=30, pady=3, sticky=tk.N)
 
-        fit_v_label = tk.Label(output_results_root, text="v = {:.4e} with standard deviation = {:.4e}".
-                               format(stat_v, sd_v), font=arial)
+        fit_v_label = tk.Label(output_results_root, text="v = {:.4e} {}/{} with standard deviation = {:.4e}".
+                               format(stat_v, Output_Parameters[1], Output_Parameters[2], sd_v), font=arial)
         fit_v_label.grid(row=7, column=0, padx=30, pady=3, sticky=tk.N)
+
+    style.configure('Save.TButton', font=arial, borderless=1)
+    save_calcilated_data_button = ttk.Button(output_results_root, text="Save fitted points",
+                                             command=lambda: [save_calcilated_data()], style='Save.TButton')
+    save_calcilated_data_button.grid(row=9, padx=30, column=0, pady=3)
 
     "###-=-=-=-=-=-=-=-=-=-=-=-=- Graph Results -=-=-=-=-=-=-=-=-=-=-=-=-=-###"
     if make_graphs.get() is True:
@@ -1257,6 +1333,10 @@ use_distribution_checkbox.pack(anchor=tk.W, padx=10)
 
 make_graphs = tk.BooleanVar()
 make_graphs.set(0)
+make_graphs_checkbox = tk.Checkbutton(choose_root, text="Make graphs",
+                                      variable=make_graphs,
+                                      onvalue=1, offvalue=0)
+make_graphs_checkbox.pack(anchor=tk.W, padx=10)
 
 "###-=-=-=-=-=-=- Choose the geometry -=-=-=-=-=-=-###"
 
@@ -1441,9 +1521,6 @@ intput_g.grid(row=5, column=0, padx=10, sticky=tk.W)
 intput_kg = tk.Radiobutton(output_parameters_root, text='kg', variable=output_mass_var, value=6,
                            command=lambda: [choose_output_mass(6)])
 intput_kg.grid(row=6, column=0, padx=10, sticky=tk.W)
-intput_percent = tk.Radiobutton(output_parameters_root, text='%', variable=output_mass_var, value=7,
-                           command=lambda: [choose_output_mass(7)])
-intput_percent.grid(row=7, column=0, padx=10, sticky=tk.W)
 
 
 def choose_output_mass(val):
